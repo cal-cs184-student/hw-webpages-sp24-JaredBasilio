@@ -322,16 +322,8 @@
 <h4>How did we implement pixel sampling?</h4>
 <p>
   To implement pixel sampling, we needed to modify three functions
-  <code>RasterizerImp::rasterize_textured_triangle</code>,
   <code>Texture::sample_nearest</code>, and
   <code>Texture::sample_bilinear</code>.
-</p>
-<code>RasterizerImp::rasterize_textured_triangle</code>
-<p>
-  In this function, we find our compute parameters that will be filled in our sampling method.
-  For \((x,y) \), \((x + 1,y) \), and \((x,y + 1) \), we find the barycentric coordinates given these points
-  and the points of the triangle, then multiply each result by the weights provided.
-  The result is passed into our provided sampling method.
 </p>
 <br />
 <code>Texture::sample_nearest</code>
@@ -411,9 +403,35 @@
   to be used depending on the distance or orientation of the camera faced towards it.
 </p>
 <h4>How did we implement level sampling?</h4>
-<br />
-<p>TODO</p>
-
+<p>
+  We implemented level sampling by modifying our 
+  <code>RasterizerImp::rasterize_textured_triangle</code>,
+  <code>Texture::sample</code>, and 
+  <code>Texture::get_level</code> functions.
+</p>
+<code>RasterizerImp::rasterize_textured_triangle</code>
+<p>
+  In this function, we find our compute parameters that will be filled in our sampling method.
+  For \((x,y) \), \((x + 1,y) \), and \((x,y + 1) \), we find the barycentric coordinates given these points
+  and the points of the triangle, then multiply each result by the weights provided.
+  The result is passed into our provided sampling method.
+</p>
+<code>Texture::sample</code>
+<p>
+  In the sample function, we first calculate the level by the get_level and sp.lsm, and calculate the corresponding color using the psm.
+</p>
+<code>Texture::get_level</code>
+<p>
+  In the get level function, we utilized the following function to determine where du/dx and dv/dx is
+  the change in distances from the center point.
+  \[L = max(\sqrt{(\frac{du}{dx})^2 + (\frac{dv}{dx})^2},\sqrt{(\frac{du}{dy})^2 + (\frac{dv}{dy})^2})\]
+  \[D = log_2L \]
+</p>
+<h4>Tradeoffs</h4>
+<p>
+  Mipmap requires more storage since multiple versions of each texture are stored
+  and accessing multiple different versions of a texture could increase render times.
+</p>
 
 <!-- <p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 
