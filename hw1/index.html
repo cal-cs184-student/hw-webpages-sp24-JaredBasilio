@@ -430,8 +430,16 @@
 </p>
 <h4>Tradeoffs</h4>
 <p>
+  There are various tradeoffs to our multiple sampling techniques. 
+  Nearest and bilinear level interpolation blurs the image and reduce antialiasing. 
+  In some cases one screen pixel corresponds to a large space on the texture space. 
+  If we use texture map of level zero, we would sample it from only a pixel in the large corresponding space, 
+  whose color may be quite far from the average color of that space and cause aliasing to happen. 
+  When we add more interpolation, more blurring takes place and the power of antialiasing is stronger.
   Mipmap requires more storage since multiple versions of each texture are stored
-  and accessing multiple different versions of a texture could increase render times.
+  and accessing multiple different versions of a texture could increase render times. Adding interpolation and more 
+  samples causes more memory access, therefore
+  lowers the speed of the render.
 </p>
 
 <!-- <p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
