@@ -1,7 +1,285 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 4 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Mesh Editor</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2024</h1>
+<h1 align="middle">Homework 4: Cloth Simulator</h1>
+<h2 align="middle">Jared Basilio CS184</h2>
+<a href="https://cal-cs184-student.github.io/hw-webpages-sp24-JaredBasilio/hw4/index.html">Link to Website</a>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>
+  This assignment implements the end to end process of creating a model that acts on external/internal forces, colliding with objects, and colliding with itself. Additionally, 
+  in the assignment we shade, texture, and give mapping properties to each dynamic shape.
+</p>
+
+<h2 align="middle">Part I: Masses and springs</h2>
+
+<div align="middle">
+  <table style="width:100%">
+    <tr align="center">
+      <td>
+        <img src="part_1/all.png" align="middle" width="400px"/>
+        <figcaption>All Constraints</figcaption>
+      </td>
+      <td>
+        <img src="part_1/only_structural.png" align="middle" width="400px"/>
+        <figcaption>Only Structural</figcaption>
+      </td>
+    </tr>
+    <tr align="center">
+      <td>
+        <img src="part_1/only_shearing.png" align="middle" width="400px"/>
+        <figcaption>Only Shearing</figcaption>
+      </td>
+      <td>
+        <img src="part_1/only_bending.png" align="middle" width="400px"/>
+        <figcaption>Only Bending</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h2 align="middle">Part II: Simulation via numerical integration</h2>
+<div align="middle">
+  <p>
+    When modifying the spring constant <code>ks</code>, a lower <code>ks</code> a smoother bend between points in the cloth while  
+    a higher <code>ks</code> creates more impurities. An analogy this can be related to is using an elastic/rubber parachute over using something like a cloth parachute. The cloth parachute will fold in some places while the 
+    rubber parachute will have a smoother surface. 
+  </p>
+  <table style="width:100%">
+    <tr align="center">
+      <td>
+        <img src="part_2/low_ks.png" align="middle" width="400px"/>
+        <figcaption>Low KS (20)</figcaption>
+      </td>
+      <td>
+        <img src="part_2/high_ks.png" align="middle" width="400px"/>
+        <figcaption>High KS (20000)</figcaption>
+      </td>
+    </tr>
+  </table>
+  <p>
+    When modifying the damping value, a lower damping value the cloth did not fall as uniformly as it did if it had a higher damping value. 
+    Additionally, the cloth was very stiff when the cloth fell with a higher damping value. As partially evident from the below photos, the higher damped cloth 
+    has far less "wrinkles" than the lower damped cloth.
+  </p>
+  <table style="width:100%">
+    <tr align="center">
+      <td>
+        <img src="part_2/low_damp.png" align="middle" width="400px"/>
+        <figcaption>Lower Damp Value (0.103%)</figcaption>
+      </td>
+      <td>
+        <img src="part_2/high_damp.png" align="middle" width="400px"/>
+        <figcaption>Higher Damp Value (0.59%)</figcaption>
+      </td>
+    </tr>
+  </table>
+  <p>
+    When modifying the density, a lower density appears to fall a little faster and has more bounce than a higher density. This is not too evident in our case as we 
+    do not utilize this variable in thie step.
+  </p>
+  <table style="width:100%">
+    <tr align="center">
+      <td>
+        <img src="part_2/low_density.png" align="middle" width="400px"/>
+        <figcaption>Low Density (10)</figcaption>
+      </td>
+      <td>
+        <img src="part_2/high_density.png" align="middle" width="400px"/>
+        <figcaption>High Density (1e17 *for testing purposes)</figcaption>
+      </td>
+    </tr>
+  </table>
+  <img src="part_2/pinned_4.png" align="middle" width="400px"/>
+  <figcaption>4 Pinned Cloth with Standard Params</figcaption>
+</div>
+
+<h2 align="middle">Part III: Handling collisions with other objects</h2>
+<div align="middle">
+  <p>The main difference we see is the elastisity of the cloth. As we increase the spring constant, 
+    the cloth droops lower past the sphere.
+  </p>
+  <table style="width:100%">
+    <tr align="center">
+      <td>
+        <img src="part_3/15_ks.png" align="middle" width="300px"/>
+        <figcaption>Low KS (15)</figcaption>
+      </td>
+      <td>
+        <img src="part_3/500_ks.png" align="middle" width="300px"/>
+        <figcaption>Medium KS (500)</figcaption>
+      </td>
+      <td>
+        <img src="part_3/5000_ks.png" align="middle" width="300px"/>
+        <figcaption>High KS (5000)</figcaption>
+      </td>
+    </tr>
+  </table>
+  <img src="part_3/plane.png" align="middle" width="300px"/>
+  <figcaption>Plane w/ Default Params</figcaption>
+</div>
+<h2 align="middle">Part IV: Handling self-collisions</h2>
+<div align="middle">
+  <table style="width:100%">
+    <tr align="center">
+      <td>
+        <img src="part_4/initial.png" align="middle" width="300px"/>
+        <figcaption>Initial</figcaption>
+      </td>
+      <td>
+        <img src="part_4/middle.png" align="middle" width="300px"/>
+        <figcaption>Middle</figcaption>
+      </td>
+      <td>
+        <img src="part_4/end.png" align="middle" width="300px"/>
+        <figcaption>Near End</figcaption>
+      </td>
+    </tr>
+  </table>
+  <p>With a higher density, the cloth falls more uniformly than if it has a lower density. On the 
+    other hand, a cloth with a lower spring constant falls more uniformly than a cloth with a higher one.
+  </p>
+  <table>
+    <tr align="center">
+      <td>
+        <img src="part_4/low_density.png" align="middle" width="400px"/>
+        <figcaption>Low Density</figcaption>
+      </td>
+      <td>
+        <img src="part_4/high_density.png" align="middle" width="400px"/>
+        <figcaption>High Density</figcaption>
+      </td>
+    </tr>
+  </table>
+  <table>
+    <tr align="center">
+      <td>
+        <img src="part_4/low_ks.png" align="middle" width="400px"/>
+        <figcaption>Low KS</figcaption>
+      </td>
+      <td>
+        <img src="part_4/high_ks.png" align="middle" width="400px"/>
+        <figcaption>High KS</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h2 align="middle">Part V: Cloth Sim</h2>
+<div align="middle">
+  <h2 align="middle">Shader Program</h2>
+  <p>
+    Shader programs run in parallel with the physical renderer to provide color values for the 
+    triangle (RGBA) given the lighting and texture mapping in the scene and general screen position (like which pixel on the screen will this color populate).
+    There are two types of shader programs, vertex shaders and fragment shaders. 
+    Vertex shaders manage the mapping from the 3D world to the 2D space on our screen. Fragment Shaders determine the color given the lighting and texture. 
+    As a result, the shader programs effictively provides the depth for our 3D models given the models created from the renderer.
+  </p>
+  <h2 align="middle">Blinn-Phong Shading Model</h2>
+  <p>
+    The Blinn-Phong Shading model is comprised of three main components: ambient light, diffuse light, and specular light. Combining the three creates 
+    an overall realistic looking object incorporating what we usually see in everyday life.
+    <div align="left" width="50%">
+      <ul>
+        <li>Ambient Light: The color of the object as revealed by the intensity of the light.</li>
+        <li>Diffuse Light: Provides reflection to the object, incorporating shadows giving the object a matte feel.</li>
+        <li>Specular Light: Provides light intensity and camera (or viewer) position to determine actual reflectance</li>
+      </ul>
+    </div>
+  </p>
+  <table>
+    <tr align="center">
+      <td>
+        <img src="part_5/only_ambient.png" align="middle" width="400px"/>
+        <figcaption>Only Ambient</figcaption>
+      </td>
+      <td>
+        <img src="part_5/only_diffuse.png" align="middle" width="400px"/>
+        <figcaption>Only Diffuse</figcaption>
+      </td>
+    </tr>
+    <tr align="center">
+      <td>
+        <img src="part_5/only_specular.png" align="middle" width="400px"/>
+        <figcaption>Only Specular</figcaption>
+      </td>
+      <td>
+        <img src="part_5/full.png" align="middle" width="400px"/>
+        <figcaption>All</figcaption>
+      </td>
+    </tr>
+  </table>
+  <img src="part_5/custom_texture.png" align="middle" width="400px"/>
+  <figcaption>Custom Texture</figcaption>
+  <table>
+    <tr align="center">
+      <td>
+        <img src="part_5/cloth_sphere_bump.png" align="middle" width="400px"/>
+        <figcaption>Cloth and Sphere Bump</figcaption>
+      </td>
+      <td>
+        <img src="part_5/cloth_sphere_displacement.png" align="middle" width="400px"/>
+        <figcaption>Sphere Displacement</figcaption>
+      </td>
+    </tr>
+  </table>
+  <p>
+    Changing the coarseness of the shape changes the sensitivity of the texture on the position in the shape. More formally, the more black (or white) the pixel is, 
+    the more it will extrude away from the shape when the coarseness is high.
+  </p>
+  <table>
+    <tr align="center">
+      <td>
+        <img src="part_5/low_coarse_displacement.png" align="middle" width="400px"/>
+        <figcaption>-o 16 -a 16 (Displacement)</figcaption>
+      </td>
+      <td>
+        <img src="part_5/high_coarse_displacement.png" align="middle" width="400px"/>
+        <figcaption>-o 128 -a 128 (Displacement)</figcaption>
+      </td>
+    </tr>
+  </table>
+  <table>
+    <tr align="center">
+      <td>
+        <img src="part_5/low_coarse_bump.png" align="middle" width="400px"/>
+        <figcaption>-o 16 -a 16 (Bump)</figcaption>
+      </td>
+      <td>
+        <img src="part_5/high_coarse_bump.png" align="middle" width="400px"/>
+        <figcaption>-o 128 -a 128 (Bump)</figcaption>
+      </td>
+    </tr>
+  </table>
+  <img src="part_5/mirror.png" align="middle" width="400px"/>
+  <figcaption>Mirror</figcaption>
+</div>
+</body>
 </html>
